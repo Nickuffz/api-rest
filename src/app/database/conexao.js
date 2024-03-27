@@ -1,25 +1,27 @@
 import mysql from 'mysql'
 
-const conexao = mysql.createConnection({
+const conexao = mysql.createPool({
+    connectionLimit: 5,
     host: 'localhost',
     port: '3306',
     user: 'root',
     password: 'password',
     database: 'db'
-})
+});
 
 conexao.connect()
 
-export const consulta = (sql, values='', msgReject) => {
+export const consulta = (sql, values= -[]) => {
     return new Promise((resolve, reject) => {   
         conexao.query(sql, values, (err, result) => {
             if(err){
-                return reject(msgReject)
+                reject(err)
             }
-            const row = JSON.parse(JSON.stringify(result))
-            return resolve(row)
-        })
-    })
+            else{
+                resolve(JSON.parse(JSON.stringify(result)))
+            }
+        });
+    });
 }
 
 export default conexao
